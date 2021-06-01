@@ -7,7 +7,10 @@ edition = "2018"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-hyper = { version = "0.14.8", features = ["full"] }
-hyper-tls = "0.5.0"
+# hyper = { version = "0.14.8", features = ["full"] }
+# hyper-tls = "0.5.0"
 select = "0.5.0"
 tokio = { version = "1.6.0", features = ["full"] }
+reqwest = { version = "0.11.3", features = ["blocking"] }
+filename = "0.1.1"
+futures = "0.3.8"
