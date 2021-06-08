@@ -8,7 +8,7 @@ use handlebars::Handlebars;
 
 use serde_json::json;
 
-mod renderer {
+mod template {
     use std::sync::Arc;
     use handlebars::Handlebars;
     use serde::Serialize;
@@ -48,11 +48,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     });
 
     let handlebars = Arc::new(handlebars);
-    let render_filter = move |template| renderer::reply_with_template(template, Arc::clone(&handlebars));
+    let render_filter = move |template| template::reply_with_template(template, Arc::clone(&handlebars));
 
     let templates = warp::path::end()
         .map(move || {
-            renderer::Template::new("index", data.clone())
+            template::Template::new("index", data.clone())
         })
         .map(render_filter);
 
