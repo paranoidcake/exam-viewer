@@ -1,0 +1,13 @@
+<html>
+    <head>
+        <link rel="stylesheet" type="text/css" href="/styles/app.css"/>
+    </head>
+    <body>
+        {{#each this.[Chemistry] as |level|}}
+            <h1>{{level.[0]}}</h1>
+            {{#each level.[1] as |path|}}
+                <p>{{path}}</p>
+            {{/each}}
+        {{/each}}
+    </body>
+</html>
