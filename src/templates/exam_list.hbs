@@ -1,13 +1,22 @@
+<!DOCTYPE html>
 <html>
     <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel="stylesheet" type="text/css" href="/styles/app.css"/>
     </head>
     <body>
-        {{#each this.[Chemistry] as |level|}}
-            <h1>{{level.[0]}}</h1>
-            {{#each level.[1] as |path|}}
-                <p>{{path}}</p>
-            {{/each}}
-        {{/each}}
+        <section class="section">
+            <span class="columns">
+                {{#each this.[Chemistry] as |level|}}
+                <span class="column">
+                    <h1 class="title">{{level.[0]}}</h1>
+
+                    {{#each level.[1] as |path|}}
+                    <p>{{file-stem }}</p>
+                    {{/each}}
+                </span>
+                {{/each}}
+            </span>
+        </section>
     </body>
 </html>

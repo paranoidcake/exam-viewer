@@ -18,7 +18,7 @@ fn get_exam_pdfs() -> Result<HashMap<String, Vec<(String, Vec<PathBuf>)>>, Box<d
     let root_path = PathBuf::from("./assets/papers");
     // let mut hash_map: HashMap<String, Vec<(String, Vec<PathBuf>)>> = HashMap::new();
 
-    Ok(
+    return Ok(
         read_dir(root_path)?.into_iter()
         .map(|entry| {
             let entry = entry.unwrap();
@@ -61,49 +61,23 @@ fn get_exam_pdfs() -> Result<HashMap<String, Vec<(String, Vec<PathBuf>)>>, Box<d
 //     }
 // }
 
-type JsonTemplate = lib::template::Template<handlebars::JsonValue>;
-
-fn index() -> BoxedFilter<(JsonTemplate,)> {
-    warp::path::end()
-        .map(move || {
-            lib::template::Template::new("index", json!({
-                "value": "test!"
-            }))
-        })
-        .boxed()
-}
-
-fn exam_list() -> BoxedFilter<(JsonTemplate,)> {
-    warp::path!("papers")
-        .and(warp::path::end())
-        .map(move || {
-            lib::template::Template::new("exam_list", json!(
-                get_exam_pdfs().unwrap_or_default()
-            ))
-        })
-        .boxed()
-}
-
-fn styles() -> BoxedFilter<(warp::fs::File,)> {
-    warp::path("styles")
-        .and(warp::fs::dir(PathBuf::from("./src/styles")))
-        .boxed()
-}
-
 fn rendered_templates() -> Result<BoxedFilter<(impl warp::Reply,)>, Box<dyn std::error::Error>> {
     let mut handlebars = Handlebars::new();
-    // handlebars.register_template_file("index", "./src/templates/index.hbs");
+
+    handlebars.set_dev_mode(true);
     handlebars.register_templates_directory(".hbs", "./src/templates/")?;
+
+    lib::register_helpers(&mut handlebars);
 
     let handlebars = Arc::new(handlebars);
 
     let render_filter = move |template| {
         lib::template::reply_with_template(template, Arc::clone(&handlebars))
     };
-    
-    Ok(
-        index().map(render_filter.clone()).or(
-            exam_list().map(render_filter)
+
+    return Ok(
+        lib::filters::index().map(render_filter.clone()).or(
+            lib::filters::exam_list().map(render_filter)
         ).boxed()
     )
 }
@@ -127,7 +101,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let templates = rendered_templates()?;
 
     let routes = templates
-        .or(styles());
+        .or(lib::filters::styles());
 
     warp::serve(routes)
         .run(([127, 0, 0, 1], 8888))
