@@ -2,6 +2,11 @@
 
 Web server to provide various views of Leaving Certificate exam papers and marking schemes.
 
+[Warp](https://github.com/seanmonstar/warp) is used to serve pages which are rendered server-side using [`handlebars`](https://github.com/sunng87/handlebars-rust).
+CSS is handled using [Bulma](https://bulma.io), and is the only frontend dependency.
+
+Development wise, the goal is to reduce client-side bloat by using server-side rendering and as little Javascript as possible to keep page loads quick and small.
+
 ## Installation
 0. Install `rust`
 1. Run `cargo build`
