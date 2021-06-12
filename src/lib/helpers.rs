@@ -1,4 +1,4 @@
-use handlebars::{Handlebars, RenderContext, Helper, Context, JsonRender, HelperResult, Output, RenderError};
+use handlebars::{Handlebars, RenderContext, Helper, Context, HelperResult, Output, RenderError};
 use std::path::PathBuf;
 
 pub fn register_helpers(hb: &mut Handlebars) {

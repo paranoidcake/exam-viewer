@@ -3,10 +3,14 @@ use tokio::time::Duration;
 use select::document::Document;
 use select::predicate::{Name, Attr, Class};
 
+#[allow(dead_code)]
 const FIREFOX_USER_AGENT: &str = "Mozilla/5.0 (X11; Linux x86_64; rv:88.0) Gecko/20100101 Firefox/88.0";
+#[allow(dead_code)]
 const RETRY_DELAY_MS: u64 = 2000;
+#[allow(dead_code)]
 const REQUEST_DELAY_MS: u64 = 1000;
 
+#[allow(dead_code)]
 pub async fn scrape_exams(output_path: &str) -> Result<(), Box<dyn std::error::Error>> {
     let url = "https://theleavingcert.com/exam-papers/";
     let client = reqwest::Client::new();
