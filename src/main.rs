@@ -1,44 +1,11 @@
 mod lib;
 
 use std::sync::Arc;
-use std::path::PathBuf;
 
 use warp::Filter;
 use warp::filters::BoxedFilter;
 
 use handlebars::Handlebars;
-use serde_json::json;
-
-use std::error::Error;
-use std::collections::HashMap;
-use std::fs::read_dir;
-
-#[cached::proc_macro::cached(size = 1, result = true)]
-fn get_exam_pdfs() -> Result<HashMap<String, Vec<(String, Vec<PathBuf>)>>, Box<dyn Error>> {
-    let root_path = PathBuf::from("./assets/papers");
-    // let mut hash_map: HashMap<String, Vec<(String, Vec<PathBuf>)>> = HashMap::new();
-
-    return Ok(
-        read_dir(root_path)?.into_iter()
-        .map(|entry| {
-            let entry = entry.unwrap();
-            (entry.path(), entry.file_name())
-        })
-        .map(|(path, subject)| {
-            (subject.into_string().unwrap(),
-            read_dir(path).unwrap().into_iter().map(|level| {
-                let level = level.unwrap();
-                
-                (
-                    level.file_name().into_string().unwrap(),
-                    read_dir(level.path()).unwrap().map(|pdf| {
-                        pdf.unwrap().path()
-                    }).collect::<Vec<_>>()
-                )
-            }).collect::<Vec<_>>())
-        }).collect()
-    )
-}
 
 // TODO: Maybe come back to this
 // struct Page {
@@ -101,7 +68,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let templates = rendered_templates()?;
 
     let routes = templates
-        .or(lib::filters::styles());
+        .or(lib::filters::styles())
+        .or(lib::filters::assets())
+        .or(lib::filters::scripts());
 
     warp::serve(routes)
         .run(([127, 0, 0, 1], 8888))
