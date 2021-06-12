@@ -28,7 +28,7 @@ use handlebars::Handlebars;
 //     }
 // }
 
-fn rendered_templates() -> Result<BoxedFilter<(impl warp::Reply,)>, Box<dyn std::error::Error>> {
+fn register_new_handlebars() -> Result<Handlebars<'static>, Box<dyn std::error::Error>> {
     let mut handlebars = Handlebars::new();
 
     handlebars.set_dev_mode(true);
@@ -36,7 +36,11 @@ fn rendered_templates() -> Result<BoxedFilter<(impl warp::Reply,)>, Box<dyn std:
 
     lib::register_helpers(&mut handlebars);
 
-    let handlebars = Arc::new(handlebars);
+    Ok(handlebars)
+}
+
+fn entry_pages() -> Result<BoxedFilter<(impl warp::Reply,)>, Box<dyn std::error::Error>> {
+    let handlebars = Arc::new(register_new_handlebars()?);
 
     let render_filter = move |template| {
         lib::template::reply_with_template(template, Arc::clone(&handlebars))
@@ -65,9 +69,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     //     )
     // ];
 
-    let templates = rendered_templates()?;
+    let entry_pages = entry_pages()?;
 
-    let routes = templates
+    let routes = entry_pages
         .or(lib::filters::styles())
         .or(lib::filters::assets())
         .or(lib::filters::scripts());
@@ -75,6 +79,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     warp::serve(routes)
         .run(([127, 0, 0, 1], 8888))
         .await;
-    
+
     Ok(())
 }
