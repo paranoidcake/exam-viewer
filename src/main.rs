@@ -48,7 +48,9 @@ fn entry_pages() -> Result<BoxedFilter<(impl warp::Reply,)>, Box<dyn std::error:
 
     return Ok(
         lib::filters::index().map(render_filter.clone()).or(
-            lib::filters::exam_list().map(render_filter)
+            lib::filters::exam_list().map(render_filter.clone())
+        ).or(
+            lib::filters::exam_subject().map(render_filter)
         ).boxed()
     )
 }

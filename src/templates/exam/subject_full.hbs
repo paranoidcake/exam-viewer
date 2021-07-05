@@ -1,0 +1,28 @@
+{{#> entry}}
+    {{#*inline "head"}}
+        <title>{{heading}}</title>
+    {{/inline}}
+    {{#*inline "body"}}
+        <section class="section">
+            <h2 class="title is-2">{{heading}}</h2>
+
+            <div class="columns">
+                {{#each contents as |level|}}
+                <div class="column">
+                    <h3 class="title is-3">{{level.[0]}}</h3>
+                </div>
+                {{/each}}
+            </div>
+            
+            <div class="columns">
+                {{#each contents as |level|}}
+                <div class="column">
+                    {{#each level.[1] as |path|}}
+                        <p><a href="/{{path}}">{{file-stem path}}</a></p>
+                    {{/each}}
+                </div>
+                {{/each}}
+            </div>
+        </section>
+    {{/inline}}
+{{/entry}}

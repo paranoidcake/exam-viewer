@@ -19,3 +19,4 @@ handlebars = { version = "4.0.0", features = ["dir_source"] }
 serde_json = "1.0.64"
 serde = { version = "1.0.126", features = ["rc"] }
 cached = "0.23.0"
+unicase = "2.6.0"

@@ -1,21 +1,12 @@
 {{#> entry }}
     {{#*inline "body"}}
-        {{#each this as |levels|}}
-        <section class="section">
-            <h2 class="title is-2">{{@key}}</h2>
-
-            <div class="columns">
-                {{#each levels as |level|}}
-                <div class="column">
-                    <h3 class="title is-3">{{level.[0]}}</h3>
-
-                    {{#each level.[1] as |path|}}
-                    <p><a href="/{{path}}">{{file-stem path}}</a></p>
-                    {{/each}}
-                </div>
+        <section class="section content">
+            <h1>Subjects</h1>
+            <ul>
+                {{#each this as |contents| }}
+                <li><a href="papers/{{space-to-dash (lowercase @key)}}">{{@key}}</a></li>
                 {{/each}}
-            </div>
+            </ul>
         </section>
-        {{/each}}
     {{/inline}}
 {{/entry}}
