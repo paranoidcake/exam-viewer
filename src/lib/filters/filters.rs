@@ -71,3 +71,11 @@ pub fn assets() -> impl Filter<Extract = (warp::fs::File,), Error = warp::Reject
         .and(warp::fs::dir(PathBuf::from("./assets/")))
         .boxed()
 }
+
+pub fn page_not_found() -> impl Filter<Extract = (JsonTemplate,), Error = warp::Rejection> + Clone + Send + Sync + 'static {
+    warp::any()
+        .map(|| {
+            template::Template::new("error/page_not_found", json!({}))
+        })
+        .boxed()
+}
