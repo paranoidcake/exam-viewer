@@ -22,14 +22,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // lib::scraper::scrape_exams("./assets/papers").await?;
 
     let handlebars = Arc::new(register_new_handlebars()?);
-    let render_filter = move |template| {
+    let render_template = move |template| {
         lib::template::reply_with_template(template, Arc::clone(&handlebars))
     };
 
     // Serving handlebars templates
-    let index = lib::filters::index().map(render_filter.clone());
-    let exam_list = lib::filters::exam_list().map(render_filter.clone());
-    let exam_subject = lib::filters::exam_subject().map(render_filter);
+    let index = lib::filters::index().map(render_template.clone());
+    let exam_list = lib::filters::exam_list().map(render_template.clone());
+    let exam_subject = lib::filters::exam_subject().map(render_template);
 
     let routes = index
         .or(exam_list)
