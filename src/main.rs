@@ -3,30 +3,8 @@ mod lib;
 use std::sync::Arc;
 
 use warp::Filter;
-use warp::filters::BoxedFilter;
 
 use handlebars::Handlebars;
-
-// TODO: Maybe come back to this
-// struct Page {
-//     tpl_path: &'static str, // Path relative to `src/templates/`
-//     filter: BoxedFilter<()>
-// }
-
-// impl Page {
-//     fn new(path: &'static str, filter: BoxedFilter<()>) -> Page {
-//         Page {
-//             tpl_path: path,
-//             filter: filter
-//         }
-//     }
-
-//     fn build(self: &'static Self, data: Arc<handlebars::JsonValue>) -> BoxedFilter<(template::Template<Arc<handlebars::JsonValue>>,)> {
-//         self.filter.clone().map(move || {
-//             template::Template::new(self.tpl_path, Arc::clone(&data))
-//         }).boxed()
-//     }
-// }
 
 fn register_new_handlebars() -> Result<Handlebars<'static>, Box<dyn std::error::Error>> {
     let mut handlebars = Handlebars::new();
@@ -39,41 +17,23 @@ fn register_new_handlebars() -> Result<Handlebars<'static>, Box<dyn std::error::
     Ok(handlebars)
 }
 
-fn entry_pages() -> Result<BoxedFilter<(impl warp::Reply,)>, Box<dyn std::error::Error>> {
-    let handlebars = Arc::new(register_new_handlebars()?);
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    // lib::scraper::scrape_exams("./assets/papers").await?;
 
+    let handlebars = Arc::new(register_new_handlebars()?);
     let render_filter = move |template| {
         lib::template::reply_with_template(template, Arc::clone(&handlebars))
     };
 
-    return Ok(
-        lib::filters::index().map(render_filter.clone()).or(
-            lib::filters::exam_list().map(render_filter.clone())
-        ).or(
-            lib::filters::exam_subject().map(render_filter)
-        ).boxed()
-    )
-}
+    // Serving handlebars templates
+    let index = lib::filters::index().map(render_filter.clone());
+    let exam_list = lib::filters::exam_list().map(render_filter.clone());
+    let exam_subject = lib::filters::exam_subject().map(render_filter);
 
-#[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    // lib::scraper::scrape_exams("./assets/papers").await?;
-    
-    // TODO: Maybe come back to this
-    // let pages = vec![
-    //     Page::new(
-    //         "index",
-    //         warp::path::end().boxed()
-    //     ),
-    //     Page::new(
-    //         "exam_list",
-    //         warp::path("papers").boxed()
-    //     )
-    // ];
-
-    let entry_pages = entry_pages()?;
-
-    let routes = entry_pages
+    let routes = index
+        .or(exam_list)
+        .or(exam_subject)
         .or(lib::filters::styles())
         .or(lib::filters::assets())
         .or(lib::filters::scripts());

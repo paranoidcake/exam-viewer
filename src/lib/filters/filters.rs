@@ -6,21 +6,19 @@ use std::path::PathBuf;
 use serde_json::json;
 
 use warp::Filter;
-use warp::filters::BoxedFilter;
 
 type JsonTemplate = template::Template<handlebars::JsonValue>;
 
-pub fn index() -> BoxedFilter<(JsonTemplate,)> {
+pub fn index() -> impl Filter<Extract = (JsonTemplate,), Error = warp::Rejection> + Clone + Send + Sync + 'static {
     warp::get().and(warp::path::end())
-        .map(move || {
-            template::Template::new("index", json!({
-                "value": "test!"
-            }))
-        })
-        .boxed()
+    .map(move || {
+        template::Template::new("index", json!({
+            "value": "test!"
+        }))
+    })
 }
 
-pub fn exam_list() -> BoxedFilter<(JsonTemplate,)> {
+pub fn exam_list() -> impl Filter<Extract = (JsonTemplate,), Error = warp::Rejection> + Clone + Send + Sync + 'static {
     warp::get().and(warp::path!("papers"))
         .and(warp::path::end())
         .map(move || {
@@ -28,10 +26,9 @@ pub fn exam_list() -> BoxedFilter<(JsonTemplate,)> {
                 util::get_exam_pdfs().unwrap_or_default()
             ))
         })
-        .boxed()
 }
 
-pub fn exam_subject() -> BoxedFilter<(JsonTemplate,)> {
+pub fn exam_subject() -> impl Filter<Extract = (JsonTemplate,), Error = warp::Rejection> + Clone + Send + Sync + 'static {
     warp::get().and(warp::path!("papers" / String))
         .and(warp::path::end())
         .map(|param: String| {
@@ -52,23 +49,19 @@ pub fn exam_subject() -> BoxedFilter<(JsonTemplate,)> {
                 "contents": pdfs.get(key).unwrap()
             }))
         })
-        .boxed()
 }
 
-pub fn styles() -> BoxedFilter<(warp::fs::File,)> {
+pub fn styles() -> impl Filter<Extract = (warp::fs::File,), Error = warp::Rejection> + Clone + Send + Sync + 'static {
     warp::path("styles")
         .and(warp::fs::dir(PathBuf::from("./src/styles")))
-        .boxed()
 }
 
-pub fn scripts() -> BoxedFilter<(warp::fs::File,)> {
+pub fn scripts() -> impl Filter<Extract = (warp::fs::File,), Error = warp::Rejection> + Clone + Send + Sync + 'static {
     warp::path("scripts")
         .and(warp::fs::dir(PathBuf::from("./src/scripts")))
-        .boxed()
 }
 
-pub fn assets() -> BoxedFilter<(warp::fs::File,)> {
+pub fn assets() -> impl Filter<Extract = (warp::fs::File,), Error = warp::Rejection> + Clone + Send + Sync + 'static {
     warp::path("assets")
         .and(warp::fs::dir(PathBuf::from("./assets/")))
-        .boxed()
 }
