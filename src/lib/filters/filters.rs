@@ -11,11 +11,12 @@ type JsonTemplate = template::Template<handlebars::JsonValue>;
 
 pub fn index() -> impl Filter<Extract = (JsonTemplate,), Error = warp::Rejection> + Clone + Send + Sync + 'static {
     warp::get().and(warp::path::end())
-    .map(move || {
-        template::Template::new("index", json!({
-            "value": "test!"
-        }))
-    })
+        .map(move || {
+            template::Template::new("index", json!({
+                "value": "test!"
+            }))
+        })
+        .boxed()
 }
 
 pub fn exam_list() -> impl Filter<Extract = (JsonTemplate,), Error = warp::Rejection> + Clone + Send + Sync + 'static {
@@ -26,6 +27,7 @@ pub fn exam_list() -> impl Filter<Extract = (JsonTemplate,), Error = warp::Rejec
                 util::get_exam_pdfs().unwrap_or_default()
             ))
         })
+        .boxed()
 }
 
 pub fn exam_subject() -> impl Filter<Extract = (JsonTemplate,), Error = warp::Rejection> + Clone + Send + Sync + 'static {
@@ -49,19 +51,23 @@ pub fn exam_subject() -> impl Filter<Extract = (JsonTemplate,), Error = warp::Re
                 "contents": pdfs.get(key).unwrap()
             }))
         })
+        .boxed()
 }
 
 pub fn styles() -> impl Filter<Extract = (warp::fs::File,), Error = warp::Rejection> + Clone + Send + Sync + 'static {
     warp::path("styles")
         .and(warp::fs::dir(PathBuf::from("./src/styles")))
+        .boxed()
 }
 
 pub fn scripts() -> impl Filter<Extract = (warp::fs::File,), Error = warp::Rejection> + Clone + Send + Sync + 'static {
     warp::path("scripts")
         .and(warp::fs::dir(PathBuf::from("./src/scripts")))
+        .boxed()
 }
 
 pub fn assets() -> impl Filter<Extract = (warp::fs::File,), Error = warp::Rejection> + Clone + Send + Sync + 'static {
     warp::path("assets")
         .and(warp::fs::dir(PathBuf::from("./assets/")))
+        .boxed()
 }
