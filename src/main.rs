@@ -29,14 +29,16 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Serving handlebars templates
     let index = lib::filters::index().map(render_template.clone());
     let exam_list = lib::filters::exam_list().map(render_template.clone());
-    let exam_subject = lib::filters::exam_subject().map(render_template);
+    let exam_subject = lib::filters::exam_subject().map(render_template.clone());
+    let page_not_found = lib::filters::page_not_found().map(render_template);
 
     let routes = index
         .or(exam_list)
         .or(exam_subject)
         .or(lib::filters::styles())
         .or(lib::filters::assets())
-        .or(lib::filters::scripts());
+        .or(lib::filters::scripts())
+        .or(page_not_found.map(|reply| warp::reply::with_status(reply, warp::http::StatusCode::NOT_FOUND)));
 
     warp::serve(routes)
         .run(([127, 0, 0, 1], 8888))
